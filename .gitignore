@@ -130,3 +130,6 @@ dmypy.json
 
 #Idea Project folder
 /.idea/
+
+#Local Dict (Data)
+/dict_persistent.yaml
