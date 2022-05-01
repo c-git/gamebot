@@ -27,3 +27,6 @@ class Conf:
             NEW = {
                 'name': 'new',
                 'help': 'Starts a new game'}
+            RESET = {
+                'name': 'r',
+                'help': 'reset/clear the board'}

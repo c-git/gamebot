@@ -140,8 +140,8 @@ class Board:
 
 @dataclass
 class GameState:
-    p1: int
-    p2: int
+    p1: int = 0
+    p2: int = 0
     board: Board = field(default_factory=Board)
     turn: Turn = Turn.P1
 
@@ -182,3 +182,10 @@ class GameState:
 
     def switch_turn(self):
         self.turn = Turn.P1 if self.turn == Turn.P2 else Turn.P2
+
+    def reset(self):
+        self.board = Board()
+        return f'Game reset. It is <@{self.next_player_id}> to play'
+
+    def is_valid_game(self):
+        return self.p1 != 0 and self.p2 != 0
