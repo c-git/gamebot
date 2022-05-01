@@ -116,16 +116,16 @@ class Board:
             return True
 
         # Check win forward diagonal
-        first_piece = self.data[- 1][- 1]
+        first_piece = self.data[0][- 1]
         won = first_piece != Piece.EMPTY
-        for ind in range(2, n + 1):
-            won = won and first_piece == self.data[-ind][-ind]
+        for ind in range(1, n):
+            won = won and first_piece == self.data[ind][-ind - 1]
             if not won:
                 break
         if won:
-            for ind in range(1, n + 1):
-                self.data[-ind][-ind] = change_to_won_piece(
-                    self.data[-ind][-ind])
+            for ind in range(n):
+                self.data[ind][-ind - 1] = change_to_won_piece(
+                    self.data[ind][-ind - 1])
             return True
 
         return False
