@@ -76,7 +76,7 @@ class Board:
         for row in self.data:
             first_piece = row[0]
             if first_piece == Piece.EMPTY:
-                break  # Cannot win if first piece is empty
+                continue  # Cannot win if first piece is empty
             won = True
             for i in range(1, n):
                 won = won and first_piece == row[i]
@@ -91,7 +91,7 @@ class Board:
         for col_ind in range(n):
             first_piece = self.data[0][col_ind]
             if first_piece == Piece.EMPTY:
-                break  # Cannot win if first piece is empty
+                continue  # Cannot win if first piece is empty
             won = True
             for row_ind in range(1, n):
                 won = won and first_piece == self.data[row_ind][col_ind]
