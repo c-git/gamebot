@@ -10,13 +10,26 @@ from src.conf import Conf
 
 class Piece(Enum):
     EMPTY = ' '
-    P1 = 'X'
-    P2 = 'O'
+    P1 = 'x'
+    P2 = 'o'
+    P1_WIN = 'X'
+    P2_WIN = 'O'
 
 
 class Turn(Enum):
     P1 = 'P1'
     P2 = 'P2'
+
+
+def change_to_won_piece(piece: Piece):
+    assert piece != Piece.EMPTY
+    if piece == Piece.P1:
+        return Piece.P1_WIN
+    elif piece == Piece.P2:
+        return Piece.P2_WIN
+    else:
+        assert piece == Piece.P1_WIN or piece == Piece.P2_WIN
+        return piece
 
 
 class Board:
@@ -47,6 +60,82 @@ class Board:
         ind0, ind1 = self.str_to_index_pair(pos)
         assert self.data[ind0][ind1] == Piece.EMPTY
         self.data[ind0][ind1] = value
+
+    def is_won(self) -> bool:
+        """
+        Checks if game is won AND changes winning pieces to the winning symbol
+        ASSUMPTION: Board is square
+        WARNING: Changes board to set pieces in win to new symbol
+        NOTE: Function is idempotent
+        :return: True if game has been won and false otherwise
+        """
+        # TODO Use position played to make more efficient implementation
+        assert len(self.data) == len(self.data[0])
+        n = len(self.data)
+        # Check win by row
+        for row in self.data:
+            first_piece = row[0]
+            if first_piece == Piece.EMPTY:
+                break  # Cannot win if first piece is empty
+            won = True
+            for i in range(1, n):
+                won = won and first_piece == row[i]
+                if not won:
+                    break
+            if won:
+                for i in range(n):
+                    row[i] = change_to_won_piece(row[i])
+                return True
+
+        # Check win by column
+        for col_ind in range(n):
+            first_piece = self.data[0][col_ind]
+            if first_piece == Piece.EMPTY:
+                break  # Cannot win if first piece is empty
+            won = True
+            for row_ind in range(1, n):
+                won = won and first_piece == self.data[row_ind][col_ind]
+                if not won:
+                    break
+            if won:
+                for row_ind in range(n):
+                    self.data[row_ind][col_ind] = change_to_won_piece(
+                        self.data[row_ind][col_ind])
+                return True
+
+        # Check win backward diagonal
+        first_piece = self.data[0][0]
+        won = first_piece != Piece.EMPTY
+        for ind in range(1, n):
+            won = won and first_piece == self.data[ind][ind]
+            if not won:
+                break
+        if won:
+            for ind in range(n):
+                self.data[ind][ind] = change_to_won_piece(self.data[ind][ind])
+            return True
+
+        # Check win forward diagonal
+        first_piece = self.data[- 1][- 1]
+        won = first_piece != Piece.EMPTY
+        for ind in range(2, n + 1):
+            won = won and first_piece == self.data[-ind][-ind]
+            if not won:
+                break
+        if won:
+            for ind in range(1, n + 1):
+                self.data[-ind][-ind] = change_to_won_piece(
+                    self.data[-ind][-ind])
+            return True
+
+        return False
+
+    def is_full(self) -> bool:
+        for row in self.data:
+            for position in row:
+                if position == Piece.EMPTY:
+                    return False
+        return True
 
 
 @dataclass
@@ -84,7 +173,11 @@ class GameState:
         if piece_at_pos != Piece.EMPTY:
             return f'Position already occupied by {piece_at_pos.value}'
         self.board[pos] = self.curr_player_piece
+        if self.board.is_won():
+            return f'WINNER!!! - <@{self.next_player_id}>'
         self.switch_turn()
+        if self.board.is_full():  # Check for Draw
+            return 'DRAW - Board full'
         return f'It is now <@{self.next_player_id}> to play'
 
     def switch_turn(self):
