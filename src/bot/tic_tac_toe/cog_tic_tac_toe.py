@@ -16,7 +16,7 @@ class CogTicTacToe(commands.Cog, name='TicTacToe'):
     ##########################################################################
     # BASE GROUP
     @commands.group(**conf.BASE_GROUP)
-    async def base(self, ctx):
+    async def base(self, ctx: Context):
         await ctx.send("I'm sorry I didn't recognize that command")
 
     ##########################################################################
@@ -24,3 +24,10 @@ class CogTicTacToe(commands.Cog, name='TicTacToe'):
     @base.command(**conf.Command.NEW)
     async def new(self, ctx: Context, other_player: discord.User):
         self.data = GameState(ctx.author.id, other_player.id)
+        await self.disp_with_msg(ctx, 'New game started')
+
+    ##########################################################################
+    # HELPER FUNCTIONS
+    async def disp_with_msg(self, ctx: Context, msg: str):
+        await ctx.send(embed=self.data.as_embed())
+        await ctx.send(f'{msg}')

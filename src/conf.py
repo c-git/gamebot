@@ -1,6 +1,3 @@
-import logging
-
-
 class DBKeys:  # Database key values
     TIC_TAC_TOE = 'tictactoe'
 
@@ -8,9 +5,8 @@ class DBKeys:  # Database key values
 class Conf:
     BOT_DESCRIPTION = "GameBot"
     VERSION = '0.0.1'
-    LOG_LEVEL = logging.INFO
     COMMAND_PREFIX = '.'
-    SAVE_CACHE_DELAY = 15  # Minimum number of seconds between saves
+    EMBED_COLOR = 0x373977
 
     class ENV:  # Environment variable names
         TOKEN = 'TOKEN'
