@@ -18,7 +18,7 @@ class CogTicTacToe(commands.Cog, name='TicTacToe'):
     @commands.group(**conf.BASE_GROUP)
     async def base(self, ctx: Context, *args):
         if len(args) == 1:
-            if not self.confirm_game_in_progress(ctx):
+            if not await self.confirm_game_in_progress(ctx):
                 return
             msg = self.data.move(ctx.author, args[0])
             await self.disp_with_msg(ctx, msg)
@@ -35,8 +35,8 @@ class CogTicTacToe(commands.Cog, name='TicTacToe'):
 
     # NORMAL COMMANDS
     @base.command(**conf.Command.RESET)
-    async def reset(self, ctx: Context, other_player: discord.User):
-        if not self.confirm_game_in_progress(ctx):
+    async def reset(self, ctx: Context):
+        if not await self.confirm_game_in_progress(ctx):
             return
         msg = self.data.reset()
         await self.disp_with_msg(ctx, msg)
