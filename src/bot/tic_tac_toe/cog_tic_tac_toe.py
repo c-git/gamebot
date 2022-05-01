@@ -16,8 +16,13 @@ class CogTicTacToe(commands.Cog, name='TicTacToe'):
     ##########################################################################
     # BASE GROUP
     @commands.group(**conf.BASE_GROUP)
-    async def base(self, ctx: Context):
-        await ctx.send("I'm sorry I didn't recognize that command")
+    async def base(self, ctx: Context, *args):
+        if len(args) == 1:
+            msg = self.data.move(ctx.author, args[0])
+            await self.disp_with_msg(ctx, msg)
+        else:
+            await ctx.send(
+                f"I'm sorry I didn't recognize those parameters: {args}")
 
     ##########################################################################
     # NORMAL COMMANDS

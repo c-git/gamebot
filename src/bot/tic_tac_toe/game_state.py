@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import List
 
+import discord
 from discord import Embed
 
 from src.conf import Conf
@@ -42,3 +43,6 @@ class GameState:
             result += f'{i} {row[0].value} | {row[1].value} | {row[2].value}\n'
         result += '```'
         return Embed(color=Conf.EMBED_COLOR, description=result)
+
+    def move(self, player: discord.User, pos: str):
+        pass
