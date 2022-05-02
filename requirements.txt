@@ -1,0 +1,3 @@
+pyyaml>=5.4.1
+discord>=1.0.1
+opylib~=0.2.1
