@@ -140,8 +140,8 @@ class Board:
 
 @dataclass
 class GameState:
-    p1: int = 0
-    p2: int = 0
+    p1: int
+    p2: int
     board: Board = field(default_factory=Board)
     turn: Turn = Turn.P1
 
@@ -155,7 +155,9 @@ class GameState:
 
     def as_embed(self):
         h_line = '-' * 11 + '\n'
-        result = '```\n'
+        result = f'{Piece.P1.value} - <@{self.p1}>\n'
+        result += f'{Piece.P2.value} - <@{self.p2}>\n'
+        result += '```\n'
         result += '  A | B | C\n'
         for i, row in enumerate(self.board, 1):
             result += h_line
@@ -186,6 +188,3 @@ class GameState:
     def reset(self):
         self.board = Board()
         return f'Game reset. It is <@{self.next_player_id}> to play'
-
-    def is_valid_game(self):
-        return self.p1 != 0 and self.p2 != 0
