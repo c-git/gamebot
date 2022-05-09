@@ -30,8 +30,7 @@ class Bot(commands.Bot):
         async def on_command_error(ctx, error):
             if isinstance(error, commands.errors.CommandNotFound):
                 log(error, logging.DEBUG)
-                # No need for noisy fail message right now
-                # await ctx.send('Command Not Found (Maybe you have a typo)')
+                await ctx.send('Command Not Found (Maybe you have a typo)')
             elif isinstance(error, commands.errors.UserInputError):
                 log(error, logging.INFO)
                 await ctx.send(error)

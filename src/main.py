@@ -1,6 +1,7 @@
-# TODO: Support more than one game at a time
 # TODO: Add game instructions
 # TODO: Keep track of score
+# TODO: Add Web GUI
+# TODO: Add playing via DM instead of in channel
 import os
 
 from discord.ext import commands
