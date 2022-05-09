@@ -4,7 +4,7 @@ class DBKeys:  # Database key values
 
 class Conf:
     BOT_DESCRIPTION = "GameBot"
-    VERSION = '0.0.1'
+    VERSION = '0.0.2'
     COMMAND_PREFIX = '.'
     EMBED_COLOR = 0x373977
 
