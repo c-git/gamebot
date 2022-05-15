@@ -3,9 +3,12 @@
 # TODO: Add Web GUI
 # TODO: Add playing via DM instead of in channel
 import os
+from threading import Thread
 
+import flask
 from discord.ext import commands
 from opylib.log import log, setup_log
+from waitress import serve
 
 from src.bot.custom_bot import Bot
 from src.conf import Conf
@@ -16,6 +19,28 @@ Global Variables
 """
 
 bot: Bot
+
+##############################################################################
+""" 
+    HTML Control Section
+    Had to put them in the same file to resolve issues with getting 
+    access to variable values
+    
+"""
+app = flask.Flask('game-bot')
+
+
+@app.route('/')
+def home():
+    return flask.render_template('index.html')
+
+
+def run():
+    serve(app, host="0.0.0.0", port=8080)
+
+
+def display_start():
+    Thread(target=run).start()
 
 
 ##############################################################################
@@ -29,6 +54,7 @@ def main():
     bot = Bot(command_prefix=commands.when_mentioned_or(Conf.COMMAND_PREFIX),
               description=Conf.BOT_DESCRIPTION)
 
+    display_start()
     bot.run(os.getenv(Conf.ENV.TOKEN))
 
 
