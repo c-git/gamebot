@@ -30,3 +30,13 @@ class Conf:
             RESET = {
                 'name': 'r',
                 'help': 'reset/clear the board'}
+
+    class Hangman:
+        BASE_GROUP = {'name': 'h',
+                      'help': 'Grouping for Hangman Commands',
+                      'invoke_without_command': True}
+
+        class Command:
+            NEW = {
+                'name': 'new',
+                'help': 'Starts a new game'}
