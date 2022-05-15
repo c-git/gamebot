@@ -43,6 +43,7 @@ class Bot(commands.Bot):
             result += '```'
             await ctx.send(
                 embed=Embed(color=Conf.EMBED_COLOR, description=result))
+            await ctx.send(result)
 
         @self.command(help="Echos back the message in an embed")
         async def echo(ctx, *, msg: str):
