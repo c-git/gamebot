@@ -1,5 +1,6 @@
 import logging
 
+from discord import Embed
 from discord.ext import commands
 from opylib.log import log
 
@@ -16,6 +17,36 @@ class Bot(commands.Bot):
 
         self.tic_tac_toe = CogTicTacToe()
         self.add_cog(self.tic_tac_toe)
+
+        @self.command()
+        async def test(ctx):
+            result = '```\n'
+            result += """
+┌────────────────────────────┐
+│                            │
+│     ┌──────┐  ┌──────┐     │
+│     │      │  │      │     │
+│     │      │  │      │     │
+│     └──────┘  └──────┘     │
+│                            │
+│                            │
+│          ┌──────┐          │
+│          │      │          │
+│          └──────┘          │
+│                            │
+│                            │
+│                            │
+│                            │
+│                            │
+└────────────────────────────┘
+"""
+            result += '```'
+            await ctx.send(
+                embed=Embed(color=Conf.EMBED_COLOR, description=result))
+
+        @self.command(help="Echos back the message in an embed")
+        async def echo(ctx, *, msg: str):
+            await ctx.send(embed=Embed(color=Conf.EMBED_COLOR, description=msg))
 
         # TOP Level Commands (No Category)
         @self.command(**conf.Command.PING)
