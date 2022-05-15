@@ -37,7 +37,6 @@ class CogTicTacToe(commands.Cog, name='TicTacToe'):
         self.data[ctx.channel.id] = data
         await self.disp_with_msg(ctx, data, 'New game started')
 
-    # NORMAL COMMANDS
     @base.command(**conf.Command.RESET)
     async def reset(self, ctx: Context):
         data = await self.get_game(ctx)
