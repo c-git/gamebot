@@ -24,7 +24,8 @@ class CogHangman(commands.Cog, name='Hangman'):
             if data is None:
                 return
             msg = data.user_input(ctx.author.id, args[0])
-            await self.disp_with_msg(ctx, data, msg)
+            await ctx.send(embed=msg)
+            # TODO: OnSet word send message to channel where game was started
         else:
             await ctx.send(
                 f"I'm sorry I didn't recognize those parameters: {args}")
@@ -33,6 +34,9 @@ class CogHangman(commands.Cog, name='Hangman'):
     # NORMAL COMMANDS
     @base.command(**conf.Command.NEW)
     async def new(self, ctx: Context, other_player: discord.User):
+        # TODO Consider restricting game to only being started in channel to
+        #  have a place to respond to tell the other player they can start to
+        #  guess
         data = GameState(ctx.author.id, other_player.id)
         self.data = data
         await self.disp_with_msg(ctx, data, 'New game started')
@@ -41,8 +45,7 @@ class CogHangman(commands.Cog, name='Hangman'):
     # HELPER FUNCTIONS
     @staticmethod
     async def disp_with_msg(ctx: Context, data: GameState, msg: str):
-        await ctx.send(embed=data.as_embed())
-        await ctx.send(f'{msg}')
+        await ctx.send(embed=data.as_embed(msg))
 
     async def get_game(self, ctx: Context) -> GameState:
         # TODO Add support for multiple simultaneous games
