@@ -23,7 +23,7 @@ class CogTicTacToe(commands.Cog, name='TicTacToe'):
             data = await self.get_game(ctx)
             if data is None:
                 return
-            msg = data.move(ctx.author, args[0])
+            msg = data.move(ctx.author.id, args[0])
             await self.disp_with_msg(ctx, data, msg)
         else:
             await ctx.send(

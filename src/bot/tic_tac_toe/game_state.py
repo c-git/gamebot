@@ -2,7 +2,6 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import List, Tuple
 
-import discord
 from discord import Embed
 
 from src.conf import Conf
@@ -165,8 +164,8 @@ class GameState:
         result += '```'
         return Embed(color=Conf.EMBED_COLOR, description=result)
 
-    def move(self, player: discord.User, pos: str) -> str:
-        if self.next_player_id != player.id:
+    def move(self, player: int, pos: str) -> str:
+        if self.next_player_id != player:
             return f'It\'s not your turn. <@{self.next_player_id}> to play'
         try:
             piece_at_pos = self.board[pos]
