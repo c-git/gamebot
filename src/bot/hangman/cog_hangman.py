@@ -1,6 +1,7 @@
-from typing import Optional
+from typing import Dict, List
 
 import discord
+from discord import Embed
 from discord.ext import commands
 from discord.ext.commands import Context
 
@@ -13,7 +14,13 @@ conf = Conf.Hangman
 
 class CogHangman(commands.Cog, name='Hangman'):
     def __init__(self):
-        self.data: Optional[GameModel] = None
+        # Both dicts need to be kept synced.
+
+        # K: channel_id V: Game
+        self.data: Dict[int, GameModel] = {}
+
+        # K: player_id V: [Games] (in order pending started)
+        self.pending_setting_word: Dict[int, List[GameModel]] = {}
 
     ##########################################################################
     # BASE GROUP
@@ -25,12 +32,21 @@ class CogHangman(commands.Cog, name='Hangman'):
                 return
             if data.state == State.WAITING_FOR_GUESS:
                 msg = data.receive_guess(ctx.author.id, args[0])
+                if data.state == State.WAITING_FOR_WORD:
+                    # Game ended and new game started reg new word
+                    self.reg_awaiting_word(data)
+                await ctx.send(embed=msg)
             elif data.state == State.WAITING_FOR_WORD:
                 msg = data.receive_word(ctx.author.id, args[0])
+                if data.state == State.WAITING_FOR_GUESS:
+                    # Succeeded notify other player to start guessing
+                    await ctx.send('Word saved')
+                    await self.notify_game_start(ctx, data, msg)
+                else:
+                    # Still waiting send message generated back to user
+                    await ctx.send(embed=msg)
             else:
                 raise Exception('Unexpected State for GameState')
-            await ctx.send(embed=msg)
-            # TODO: OnSet word send message to channel where game was started
         else:
             await ctx.send(
                 f"I'm sorry I didn't recognize those parameters: {args}")
@@ -39,23 +55,76 @@ class CogHangman(commands.Cog, name='Hangman'):
     # NORMAL COMMANDS
     @base.command(**conf.Command.NEW)
     async def new(self, ctx: Context, other_player: discord.User):
-        # TODO Consider restricting game to only being started in channel to
-        #  have a place to respond to tell the other player they can start to
-        #  guess
-        data = GameModel(ctx.author.id, other_player.id)
-        self.data = data
-        await self.disp_with_msg(ctx, data, 'New game started')
+        if self.is_dm(ctx):
+            await ctx.send(
+                'Error: Games can only be started in server channels')
+            return
+        old_game = await self.get_game(ctx, False)
+        if old_game is not None:
+            self.unreg_awaiting_word(old_game)
+        new_game = GameModel(ctx.author.id, other_player.id, ctx.channel.id)
+        self.data[ctx.channel.id] = new_game
+        self.reg_awaiting_word(new_game)
+        await self.dm_setter(ctx, new_game)
+        await self.disp_with_msg(ctx, new_game, 'New game started')
 
     ##########################################################################
     # HELPER FUNCTIONS
     @staticmethod
+    def is_dm(ctx: Context) -> bool:
+        return isinstance(ctx.message.channel, discord.DMChannel)
+
+    @staticmethod
     async def disp_with_msg(ctx: Context, data: GameModel, msg: str):
         await ctx.send(embed=data.as_embed(msg))
 
-    async def get_game(self, ctx: Context) -> GameModel:
-        # TODO Add support for multiple simultaneous games
-        result = self.data
-        if result is None:
+    def reg_awaiting_word(self, game: GameModel):
+        """
+        Registers this game for awaiting a word
+        :param game: the game to unregister
+        """
+        assert game.state.WAITING_FOR_GUESS == State.WAITING_FOR_GUESS
+        setter = game.player_setter
+        pending = self.pending_setting_word.get(setter)
+        if pending is None:
+            pending = []
+            self.pending_setting_word[setter] = pending
+        pending.append(game)
+
+    def unreg_awaiting_word(self, game: GameModel):
+        """
+        Unregisters this game from awaiting a word if it's registered.
+        :param game: the game to unregister
+        """
+        setter = game.player_setter
+        pending = self.pending_setting_word.get(setter)
+        if pending is not None and game in pending:
+            pending.remove(game)
+            if len(pending) < 1:
+                self.pending_setting_word.pop(setter)
+
+    async def get_game(self, ctx: Context,
+                       should_send_msg_if_not_found=True) -> GameModel:
+        if self.is_dm(ctx):
+            # Lookup setting a word
+            pending = self.pending_setting_word.get(ctx.author.id)
+            if pending is not None:
+                result = pending[0]  # Get first game pending a word being set
+            else:
+                result = None
+        else:
+            result = self.data.get(ctx.channel.id)
+        if result is None and should_send_msg_if_not_found:
             await ctx.send(
                 'NO GAME IN PROGRESS!!! Please start a new game first')
         return result
+
+    @staticmethod
+    async def dm_setter(ctx: Context, game: GameModel):
+        user = ctx.bot.get_user(game.player_setter)
+        await user.send('Please supply the word to be guessed here')
+
+    @staticmethod
+    async def notify_game_start(ctx: Context, game: GameModel, msg: Embed):
+        channel = ctx.bot.get_channel(game.channel)
+        await channel.send(embed=msg)

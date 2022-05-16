@@ -17,9 +17,10 @@ class State(Enum):
 
 
 class GameModel:
-    def __init__(self, p1: int, p2: int):
+    def __init__(self, p1: int, p2: int, channel: int):
         self.p1 = p1
         self.p2 = p2
+        self.channel = channel
         self._guesser: Guesser = Guesser.P2
         self._word: Optional[str] = None  # Game status tied to if word is set
         self.chars_target: Optional[Set[str]] = None

@@ -5,6 +5,7 @@
 import os
 from threading import Thread
 
+import discord
 import flask
 from discord.ext import commands
 from opylib.log import log, setup_log
@@ -51,8 +52,11 @@ def main():
     setup_log(only_std_out=True)
     log('Main Started')
 
+    intents = discord.Intents.default()
+    intents.members = True
+
     bot = Bot(command_prefix=commands.when_mentioned_or(Conf.COMMAND_PREFIX),
-              description=Conf.BOT_DESCRIPTION)
+              description=Conf.BOT_DESCRIPTION, intents=intents)
 
     display_start()
     bot.run(os.getenv(Conf.ENV.TOKEN))
