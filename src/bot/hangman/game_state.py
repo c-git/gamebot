@@ -87,7 +87,21 @@ class GameState:
         result += f'\n\n{msg}'
         return Embed(color=Conf.EMBED_COLOR, description=result)
 
-    def user_input(self, player: int, inp: str) -> Embed:
+    def receive_word(self, player: int, word: str) -> Embed:
+        word = word.lower()
+        if self.state != State.WAITING_FOR_WORD:
+            raise Exception('Not waiting for a word')
+        if player != self.player_setter:
+            return self.as_embed('It is not your turn.')
+
+        if not self.validate_word(word):
+            return self.as_embed(f'"{word}" in not an allowed word')
+
+        self.word = word  # Set word
+        return self.as_embed(
+            f'<@{self.player_guesser}>\'s turn to guess')
+
+    def receive_guess(self, player: int, guess: str) -> Embed:
         assert len(self.chars_lives) > 0
 
         def check_winner() -> Optional[int]:
@@ -97,53 +111,43 @@ class GameState:
                 return self.player_setter
             return None
 
-        inp = inp.lower()
+        guess = guess.lower()
 
-        if self.state == State.WAITING_FOR_GUESS:
-            if player != self.player_guesser:
-                return self.as_embed(
-                    f'It is not your turn. <@{self.player_guesser}>\'s turn '
-                    f'to guess')
+        if self.state != State.WAITING_FOR_GUESS:
+            raise Exception('Not waiting for a guess right now')
 
-            if len(inp) != 1:
-                return self.as_embed(
-                    "Exactly 1 letter must be guessed at a time")
-
-            if not inp.isalpha():
-                return self.as_embed("Only letters allowed")
-
-            if inp in self.chars_wrong:
-                return self.as_embed("This letter has already been guessed")
-
-            if inp in self.chars_target:
-                # Correct guess
-                self.chars_target.remove(inp)
-                msg = f'{inp} is found'
-            else:
-                # Wrong guess
-                self.chars_wrong.append(inp)
-                self.chars_lives.pop()
-                msg = f'{inp} is missed'
-            # Special case of win/lose
-            winner: Optional[int] = check_winner()
-            if winner is not None:
-                # Get result before reset so display will not be affected
-                result = self.as_embed(f'<@{winner}> WINS!')
-                self.change_guesser()
-                return result
-            return self.as_embed(msg)
-        elif self.state == State.WAITING_FOR_WORD:
-            if player != self.player_setter:
-                return self.as_embed('It is not your turn.')
-
-            if not self.validate_word(inp):
-                return self.as_embed(f'"{inp}" in not an allowed word')
-
-            self.word = inp  # Set word
+        if player != self.player_guesser:
             return self.as_embed(
-                f'<@{self.player_guesser}>\'s turn to guess')
+                f'It is not your turn. <@{self.player_guesser}>\'s turn '
+                f'to guess')
+
+        if len(guess) != 1:
+            return self.as_embed(
+                "Exactly 1 letter must be guessed at a time")
+
+        if not guess.isalpha():
+            return self.as_embed("Only letters allowed")
+
+        if guess in self.chars_wrong:
+            return self.as_embed("This letter has already been guessed")
+
+        if guess in self.chars_target:
+            # Correct guess
+            self.chars_target.remove(guess)
+            msg = f'{guess} is found'
         else:
-            raise Exception('Unexpected game state')
+            # Wrong guess
+            self.chars_wrong.append(guess)
+            self.chars_lives.pop()
+            msg = f'{guess} is missed'
+        # Special case of win/lose
+        winner: Optional[int] = check_winner()
+        if winner is not None:
+            # Get result before reset so display will not be affected
+            result = self.as_embed(f'<@{winner}> WINS!')
+            self.change_guesser()
+            return result
+        return self.as_embed(msg)
 
     def new_lives(self):
         return ['♥'] * self.full_life_count

@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import Context
 
-from src.bot.hangman.game_state import GameState
+from src.bot.hangman.game_state import GameState, State
 from src.conf import Conf
 
 conf = Conf.Hangman
@@ -23,7 +23,12 @@ class CogHangman(commands.Cog, name='Hangman'):
             data = await self.get_game(ctx)
             if data is None:
                 return
-            msg = data.user_input(ctx.author.id, args[0])
+            if data.state == State.WAITING_FOR_GUESS:
+                msg = data.receive_guess(ctx.author.id, args[0])
+            elif data.state == State.WAITING_FOR_WORD:
+                msg = data.receive_word(ctx.author.id, args[0])
+            else:
+                raise Exception('Unexpected State for GameState')
             await ctx.send(embed=msg)
             # TODO: OnSet word send message to channel where game was started
         else:
