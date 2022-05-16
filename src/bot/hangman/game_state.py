@@ -91,6 +91,13 @@ class GameState:
     def user_input(self, player: int, inp: str) -> Embed:
         assert len(self.chars_lives) > 0
 
+        def check_winner() -> Optional[int]:
+            if len(self.chars_target) == 0:
+                return self.player_guesser
+            if len(self.chars_lives) == 0:
+                return self.player_setter
+            return None
+
         inp = inp.lower()
 
         if self.state == State.WAITING_FOR_GUESS:
@@ -118,7 +125,13 @@ class GameState:
                 self.chars_wrong.append(inp)
                 self.chars_lives.pop()
                 msg = f'{inp} is missed'
-            # TODO Handle win/loss
+            # Special case of win/lose
+            winner: Optional[int] = check_winner()
+            if winner is not None:
+                # Get result before reset so display will not be affected
+                result = self.as_embed(f'<@{winner}> WINS!')
+                self.change_guesser()
+                return result
             return self.as_embed(msg)
         elif self.state == State.WAITING_FOR_WORD:
             if player != self.player_setter:
