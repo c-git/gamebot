@@ -138,7 +138,7 @@ class Board:
 
 
 @dataclass
-class GameState:
+class GameModel:
     p1: int
     p2: int
     board: Board = field(default_factory=Board)

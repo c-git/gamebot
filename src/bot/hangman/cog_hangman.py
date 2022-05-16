@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import Context
 
-from src.bot.hangman.game_state import GameState, State
+from src.bot.hangman.game_model import GameModel, State
 from src.conf import Conf
 
 conf = Conf.Hangman
@@ -13,7 +13,7 @@ conf = Conf.Hangman
 
 class CogHangman(commands.Cog, name='Hangman'):
     def __init__(self):
-        self.data: Optional[GameState] = None
+        self.data: Optional[GameModel] = None
 
     ##########################################################################
     # BASE GROUP
@@ -42,17 +42,17 @@ class CogHangman(commands.Cog, name='Hangman'):
         # TODO Consider restricting game to only being started in channel to
         #  have a place to respond to tell the other player they can start to
         #  guess
-        data = GameState(ctx.author.id, other_player.id)
+        data = GameModel(ctx.author.id, other_player.id)
         self.data = data
         await self.disp_with_msg(ctx, data, 'New game started')
 
     ##########################################################################
     # HELPER FUNCTIONS
     @staticmethod
-    async def disp_with_msg(ctx: Context, data: GameState, msg: str):
+    async def disp_with_msg(ctx: Context, data: GameModel, msg: str):
         await ctx.send(embed=data.as_embed(msg))
 
-    async def get_game(self, ctx: Context) -> GameState:
+    async def get_game(self, ctx: Context) -> GameModel:
         # TODO Add support for multiple simultaneous games
         result = self.data
         if result is None:

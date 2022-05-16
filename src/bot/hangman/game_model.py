@@ -16,7 +16,7 @@ class State(Enum):
     WAITING_FOR_GUESS = 'WAITING_FOR_GUESS'
 
 
-class GameState:
+class GameModel:
     def __init__(self, p1: int, p2: int):
         self.p1 = p1
         self.p2 = p2

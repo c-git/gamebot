@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import Context
 
-from src.bot.tic_tac_toe.game_state import GameState
+from src.bot.tic_tac_toe.game_model import GameModel
 from src.conf import Conf
 
 conf = Conf.TicTacToe
@@ -13,7 +13,7 @@ conf = Conf.TicTacToe
 
 class CogTicTacToe(commands.Cog, name='TicTacToe'):
     def __init__(self):
-        self.data: Dict[int, GameState] = {}
+        self.data: Dict[int, GameModel] = {}
 
     ##########################################################################
     # BASE GROUP
@@ -33,7 +33,7 @@ class CogTicTacToe(commands.Cog, name='TicTacToe'):
     # NORMAL COMMANDS
     @base.command(**conf.Command.NEW)
     async def new(self, ctx: Context, other_player: discord.User):
-        data = GameState(ctx.author.id, other_player.id)
+        data = GameModel(ctx.author.id, other_player.id)
         self.data[ctx.channel.id] = data
         await self.disp_with_msg(ctx, data, 'New game started')
 
@@ -48,11 +48,11 @@ class CogTicTacToe(commands.Cog, name='TicTacToe'):
     ##########################################################################
     # HELPER FUNCTIONS
     @staticmethod
-    async def disp_with_msg(ctx: Context, data: GameState, msg: str):
+    async def disp_with_msg(ctx: Context, data: GameModel, msg: str):
         await ctx.send(embed=data.as_embed())
         await ctx.send(f'{msg}')
 
-    async def get_game(self, ctx: Context) -> GameState:
+    async def get_game(self, ctx: Context) -> GameModel:
         result = self.data.get(ctx.channel.id)
         if result is None:
             await ctx.send(
