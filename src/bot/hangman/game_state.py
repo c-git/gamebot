@@ -134,12 +134,12 @@ class GameState:
         if guess in self.chars_target:
             # Correct guess
             self.chars_target.remove(guess)
-            msg = f'{guess} is found'
+            msg = f'{guess} found'
         else:
             # Wrong guess
             self.chars_wrong.append(guess)
             self.chars_lives.pop()
-            msg = f'{guess} is missed'
+            msg = f'{guess} missed'
         # Special case of win/lose
         winner: Optional[int] = check_winner()
         if winner is not None:
