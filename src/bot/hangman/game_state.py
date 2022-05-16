@@ -84,8 +84,7 @@ class GameState:
             result += f'Lives left: {" ".join(self.chars_lives)}'
         elif self.state == State.WAITING_FOR_WORD:
             result += f'<@{self.player_setter}> please choose a word.'
-        else:
-            result += f'\n\n{msg}'
+        result += f'\n\n{msg}'
         return Embed(color=Conf.EMBED_COLOR, description=result)
 
     def user_input(self, player: int, inp: str) -> Embed:
