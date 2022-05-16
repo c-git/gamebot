@@ -62,12 +62,35 @@ class GameState:
             Guesser.P1 if self._guesser == Guesser.P2 else Guesser.P2
         self.word = None
 
+    @property
+    def word_disp(self):
+        result = ''
+        for c in self.word:
+            if c in self.chars_target:
+                result += '_ '
+            else:
+                result += f'{c} '
+        result = result[:-1]  # Cut off trailing space
+        return result
+
     def as_embed(self, msg=''):
         result = ''
-        result += f'\n\n{msg}'
+        if self.state == State.WAITING_FOR_GUESS:
+            result += f'Set by <@{self.player_setter}>\n\n'
+            result += f'`{self.word_disp}`\n\n'
+            # TODO Add image to embed
+            result += f'Incorrect letters guessed: ' \
+                      f'{", ".join(self.chars_wrong)}\n\n'
+            result += f'Lives left: {" ".join(self.chars_lives)}'
+        elif self.state == State.WAITING_FOR_WORD:
+            result += f'<@{self.player_setter}> please choose a word.'
+        else:
+            result += f'\n\n{msg}'
         return Embed(color=Conf.EMBED_COLOR, description=result)
 
     def user_input(self, player: int, inp: str) -> Embed:
+        assert len(self.chars_lives) > 0
+
         inp = inp.lower()
 
         if self.state == State.WAITING_FOR_GUESS:
@@ -97,7 +120,7 @@ class GameState:
                 msg = f'{inp} is missed'
             # TODO Handle win/loss
             return self.as_embed(msg)
-        elif self.state == State.WAITING_FOR_GUESS:
+        elif self.state == State.WAITING_FOR_WORD:
             if player != self.player_setter:
                 return self.as_embed('It is not your turn.')
 
