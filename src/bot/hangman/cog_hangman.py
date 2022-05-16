@@ -23,7 +23,7 @@ class CogHangman(commands.Cog, name='Hangman'):
             data = await self.get_game(ctx)
             if data is None:
                 return
-            msg = data.user_input(ctx.author, args[0])
+            msg = data.user_input(ctx.author.id, args[0])
             await self.disp_with_msg(ctx, data, msg)
         else:
             await ctx.send(

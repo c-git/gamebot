@@ -1,7 +1,6 @@
-from dataclasses import dataclass
 from enum import Enum
+from typing import Optional
 
-import discord
 from discord import Embed
 
 from src.conf import Conf
@@ -12,15 +11,16 @@ class Guesser(Enum):
     P2 = 'P2'
 
 
-@dataclass
 class GameState:
-    p1: int
-    p2: int
-    guesser: Guesser = Guesser.P2
+    def __init__(self, p1: int, p2: int):
+        self.p1 = p1
+        self.p2 = p2
+        self.guesser: Guesser = Guesser.P2
+        self.word: Optional[str] = None
 
     def as_embed(self):
         result = ''
         return Embed(color=Conf.EMBED_COLOR, description=result)
 
-    def user_input(self, player: discord.User, inp: str):
+    def user_input(self, player: int, inp: str):
         pass
