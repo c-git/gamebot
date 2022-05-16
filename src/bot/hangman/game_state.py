@@ -11,6 +11,11 @@ class Guesser(Enum):
     P2 = 'P2'
 
 
+class State(Enum):
+    WAITING_FOR_WORD = 'WAITING_FOR_WORD'
+    WAITING_FOR_GUESS = 'WAITING_FOR_GUESS'
+
+
 class GameState:
     def __init__(self, p1: int, p2: int):
         self.p1 = p1
@@ -40,6 +45,11 @@ class GameState:
             self.chars_target = set(value)
 
     @property
+    def state(self):
+        return State.WAITING_FOR_WORD if self.word is None else \
+            State.WAITING_FOR_GUESS
+
+    @property
     def player_setter(self):
         return self.p1 if self._guesser == Guesser.P2 else self.p2
 
@@ -58,12 +68,36 @@ class GameState:
         return Embed(color=Conf.EMBED_COLOR, description=result)
 
     def user_input(self, player: int, inp: str) -> Embed:
-        if self.word is not None:
-            # Guessing ongoing
-            pass
-        else:
-            # Awaiting word to be set
+        inp = inp.lower()
 
+        if self.state == State.WAITING_FOR_GUESS:
+            if player != self.player_guesser:
+                return self.as_embed(
+                    f'It is not your turn. <@{self.player_guesser}>\'s turn '
+                    f'to guess')
+
+            if len(inp) != 1:
+                return self.as_embed(
+                    "Exactly 1 letter must be guessed at a time")
+
+            if not inp.isalpha():
+                return self.as_embed("Only letters allowed")
+
+            if inp in self.chars_wrong:
+                return self.as_embed("This letter has already been guessed")
+
+            if inp in self.chars_target:
+                # Correct guess
+                self.chars_target.remove(inp)
+                msg = f'{inp} is found'
+            else:
+                # Wrong guess
+                self.chars_wrong.append(inp)
+                self.chars_lives.pop()
+                msg = f'{inp} is missed'
+            # TODO Handle win/loss
+            return self.as_embed(msg)
+        elif self.state == State.WAITING_FOR_GUESS:
             if player != self.player_setter:
                 return self.as_embed('It is not your turn.')
 
@@ -72,7 +106,9 @@ class GameState:
 
             self.word = inp  # Set word
             return self.as_embed(
-                f'It is <@{self.player_guesser}>\'s turn to guess')
+                f'<@{self.player_guesser}>\'s turn to guess')
+        else:
+            raise Exception('Unexpected game state')
 
     def new_lives(self):
         return ['♥'] * self.full_life_count
