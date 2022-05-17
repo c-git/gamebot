@@ -84,7 +84,7 @@ class GameModel:
                       f'{", ".join(self.chars_wrong)}\n\n'
             result += f'Lives left: {" ".join(self.chars_lives)}'
         elif self.state == State.WAITING_FOR_WORD:
-            result += f'<@{self.player_setter}> please choose a word.'
+            result += f'<@{self.player_setter}> please set word in the DM.'
         result += f'\n\n{msg}'
         return Embed(color=Conf.EMBED_COLOR, description=result)
 
@@ -145,7 +145,8 @@ class GameModel:
         winner: Optional[int] = check_winner()
         if winner is not None:
             # Get result before reset so display will not be affected
-            result = self.as_embed(f'<@{winner}> WINS!')
+            result = self.as_embed(
+                f'<@{winner}> WINS! The word was {self.word}')
             self.change_guesser()
             return result
         return self.as_embed(msg)
