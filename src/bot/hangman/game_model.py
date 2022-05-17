@@ -27,8 +27,24 @@ class GameModel:
         self.chars_wrong: List[str] = []
         self.full_life_count = 6
         self.chars_lives: List[str] = self.new_lives()
+        self.img_win = 'https://cdn.discordapp.com/attachments' \
+                       '/843300678222479401/975910203516149780/hangman-smile' \
+                       '.png'
         self.img_map = {
-            0: ''  # TODO: Add images
+            0: 'https://cdn.discordapp.com/attachments/843300678222479401'
+               '/975900439562317884/hangman7.png',
+            1: 'https://cdn.discordapp.com/attachments/843300678222479401'
+               '/975900439344185364/hangman6.png',
+            2: 'https://cdn.discordapp.com/attachments/843300678222479401'
+               '/975900439042199582/hangman5.png',
+            3: 'https://cdn.discordapp.com/attachments/843300678222479401'
+               '/975900438769590282/hangman4.png',
+            4: 'https://cdn.discordapp.com/attachments/843300678222479401'
+               '/975900438505324634/hangman3.png',
+            5: 'https://cdn.discordapp.com/attachments/843300678222479401'
+               '/975900438211743814/hangman2.png',
+            6: 'https://cdn.discordapp.com/attachments/843300678222479401'
+               '/975900437943291944/hangman1.png',
         }
 
     @property
@@ -64,6 +80,14 @@ class GameModel:
         self.word = None
 
     @property
+    def lives_left(self):
+        return len(self.chars_lives)
+
+    @property
+    def letters_left_to_be_guessed(self):
+        return len(self.chars_target)
+
+    @property
     def word_disp(self):
         result = ''
         for c in self.word:
@@ -79,14 +103,15 @@ class GameModel:
         if self.state == State.WAITING_FOR_GUESS:
             result += f'Set by <@{self.player_setter}>\n\n'
             result += f'`{self.word_disp}`\n\n'
-            # TODO Add image to embed
             result += f'Incorrect letters guessed: ' \
                       f'{", ".join(self.chars_wrong)}\n\n'
             result += f'Lives left: {" ".join(self.chars_lives)}'
         elif self.state == State.WAITING_FOR_WORD:
             result += f'<@{self.player_setter}> please set word in the DM.'
         result += f'\n\n{msg}'
-        return Embed(color=Conf.EMBED_COLOR, description=result)
+        result = Embed(color=Conf.EMBED_COLOR, description=result)
+        result.set_image(url=self.get_img_url())
+        return result
 
     def receive_word(self, player: int, word: str) -> Embed:
         word = word.lower()
@@ -103,12 +128,12 @@ class GameModel:
             f'<@{self.player_guesser}>\'s turn to guess')
 
     def receive_guess(self, player: int, guess: str) -> Embed:
-        assert len(self.chars_lives) > 0
+        assert self.lives_left > 0
 
         def check_winner() -> Optional[int]:
-            if len(self.chars_target) == 0:
+            if self.letters_left_to_be_guessed == 0:
                 return self.player_guesser
-            if len(self.chars_lives) == 0:
+            if self.lives_left == 0:
                 return self.player_setter
             return None
 
@@ -157,3 +182,11 @@ class GameModel:
     @staticmethod
     def validate_word(word: str):
         return True  # TODO: Validate words
+
+    def get_img_url(self) -> str:
+        if self.state == State.WAITING_FOR_WORD:
+            return ''
+        elif self.letters_left_to_be_guessed == 0:
+            return self.img_win
+        else:
+            return self.img_map[self.lives_left]
