@@ -1,4 +1,4 @@
 flask~=2.1.2
 waitress~=2.1.1
 discord>=1.0.1
-opylib~=0.2.1
+opylib==0.2.2
