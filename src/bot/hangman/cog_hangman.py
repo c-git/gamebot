@@ -70,6 +70,23 @@ class CogHangman(commands.Cog, name='Hangman'):
         await self.dm_setter(ctx, new_game)
         await self.disp_with_msg(ctx, new_game, 'New game started')
 
+    @base.command(**conf.Command.DISP)
+    async def disp(self, ctx: Context):
+        result = f'There are {len(self.data)} game(s) in progress\n'
+        awaiting = []
+        for player in self.pending_setting_word:
+            for _ in range(len(self.pending_setting_word[player])):
+                awaiting.append(player)
+        for channel, game in self.data.items():
+            if game.state == State.WAITING_FOR_WORD:
+                assert game.player_setter in awaiting
+                awaiting.remove(game.player_setter)
+            result += f'Game in <#{channel}> status: {game.status_disp}\n'
+        await ctx.send(result)
+        assert len(awaiting) == 0, \
+            f'Expected all awaiting games to be accounted for but got ' \
+            f'{len(awaiting)} left over after printing others {awaiting}'
+
     ##########################################################################
     # HELPER FUNCTIONS
     @staticmethod

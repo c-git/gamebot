@@ -191,3 +191,15 @@ class GameModel:
             return self.img_win
         else:
             return self.img_map[self.lives_left]
+
+    @property
+    def status_disp(self) -> str:
+        if self.state == State.WAITING_FOR_WORD:
+            waiting_for = 'word'
+            player = self.player_setter
+        elif self.state == State.WAITING_FOR_GUESS:
+            waiting_for = 'guess'
+            player = self.player_guesser
+        else:
+            raise Exception('Unexpected game state')
+        return f'Waiting for {waiting_for} from <@{player}>'

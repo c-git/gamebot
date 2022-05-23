@@ -42,3 +42,7 @@ class Conf:
             NEW = {
                 'name': 'new',
                 'help': 'Starts a new game'}
+
+            DISP = {
+                'name': 'disp',
+                'help': 'Show games status'}
