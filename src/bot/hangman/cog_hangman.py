@@ -153,3 +153,5 @@ class CogHangman(commands.Cog, name='Hangman'):
     async def notify_game_start(ctx: Context, game: GameModel, msg: Embed):
         channel = ctx.bot.get_channel(game.channel)
         await channel.send(embed=msg)
+        await channel.send(
+            f'<@{game.player_guesser}> please start guessing now')
