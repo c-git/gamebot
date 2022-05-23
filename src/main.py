@@ -5,7 +5,6 @@ import discord
 import flask
 from discord.ext import commands
 from opylib.log import log, setup_log
-from opylib.stopwatch import StopWatch
 from waitress import serve
 
 from src.bot.custom_bot import Bot
@@ -54,11 +53,6 @@ def display_start():
 
 
 def main():
-    setup_log(only_std_out=True)
-    sw = StopWatch('Main')
-    Validator._clean()
-    sw.end()
-    return
     global bot
     setup_log(only_std_out=True)
     log('Main Started')
