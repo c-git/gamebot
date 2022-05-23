@@ -45,6 +45,8 @@ class Validator:
         Method used for initial clean up of dictionary (kept for posterity)
         :return:
         """
+        with open(Conf.DICT_SHORT_WORDS_FN) as f:
+            allowed_short_words = set(f.readlines())
         with open(Conf.DICTIONARY_FN) as f:
             words = f.readlines()
         replacements = []
@@ -59,7 +61,9 @@ class Validator:
             except ValueError:
                 pass
 
-            if word not in unique:
+            if word not in unique and \
+                    (len(word) > 5 or
+                     word in allowed_short_words):
                 replacements.append(word)
                 unique.add(word)
         with open(Conf.DICTIONARY_FN, 'w') as f:

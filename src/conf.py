@@ -3,6 +3,7 @@ class DBKeys:  # Database key values
 
 
 class Conf:
+    DICT_SHORT_WORDS_FN = 'data/allowed_short_words.txt'
     DICTIONARY_FN = 'data/dict.txt'
     BOT_DESCRIPTION = "GameBot"
     VERSION = '0.0.2'
