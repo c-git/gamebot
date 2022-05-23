@@ -43,6 +43,8 @@ class CogHangman(commands.Cog, name='Hangman'):
                     # Succeeded notify other player to start guessing
                     await ctx.send('Word has been set')
                     await self.notify_game_start(ctx, data, msg)
+                    # Remove from waiting for guess
+                    self.unreg_awaiting_word(data)
                 else:
                     # Still waiting send message generated back to user
                     await ctx.send(embed=msg)
