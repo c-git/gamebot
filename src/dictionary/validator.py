@@ -61,6 +61,9 @@ class Validator:
             except ValueError:
                 pass
 
+            if not word[:-1].isalpha():
+                continue  # remove words that don't only contain letters
+
             if word not in unique and \
                     (len(word) > 5 or
                      word in allowed_short_words):
