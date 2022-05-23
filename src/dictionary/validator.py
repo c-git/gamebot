@@ -45,4 +45,15 @@ class Validator:
         Method used for initial clean up of dictionary (kept for posterity)
         :return:
         """
-        pass
+        with open(Conf.DICTIONARY_FN) as f:
+            words = f.readlines()
+        replacements = []
+        for word in words:
+            try:
+                pos = word.index('/')
+                word = word[:pos] + '\n'
+            except ValueError:
+                pass
+            replacements.append(word)
+        with open(Conf.DICTIONARY_FN, 'w') as f:
+            f.writelines(replacements)
