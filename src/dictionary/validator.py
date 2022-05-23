@@ -49,11 +49,15 @@ class Validator:
             words = f.readlines()
         replacements = []
         for word in words:
+            word = word.lower()  # Make all words lower case
+
+            # Remove suffixes
             try:
                 pos = word.index('/')
                 word = word[:pos] + '\n'
             except ValueError:
                 pass
+
             replacements.append(word)
         with open(Conf.DICTIONARY_FN, 'w') as f:
             f.writelines(replacements)
