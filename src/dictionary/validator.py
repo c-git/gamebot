@@ -45,6 +45,9 @@ class Validator:
         :return: A valid suggestion if possible else None
         """
         result = str(TextBlob(word).correct())
+        if not cls.is_valid_word(result):
+            # Try removing last char and see if it makes it a valid word
+            result = str(TextBlob(word[:-1]).correct())
         return result if cls.is_valid_word(result) else None
 
     @classmethod
