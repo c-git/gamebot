@@ -1,7 +1,3 @@
-# TODO: Add game instructions
-# TODO: Keep track of score
-# TODO: Add Web GUI
-# TODO: Add playing via DM instead of in channel
 import os
 from threading import Thread
 
@@ -13,8 +9,17 @@ from waitress import serve
 
 from src.bot.custom_bot import Bot
 from src.conf import Conf
+from src.dictionary.validator import Validator
+
+# TODO: Add game instructions
+# TODO: Keep track of score
+# TODO: Add Web GUI
+# TODO: Add playing via DM instead of in channel
+
 
 ##############################################################################
+
+
 """
 Global Variables
 """
