@@ -1,5 +1,7 @@
 from typing import Optional, Set, Tuple
 
+from textblob import TextBlob
+
 from src.conf import Conf
 
 
@@ -11,7 +13,8 @@ class Validator:
         if cls._valid_words is None:
             with open(Conf.DICTIONARY_FN) as f:
                 words = f.readlines()
-            cls._valid_words = set(words)
+            # -1 to strip off delimiter
+            cls._valid_words = set([x[:-1] for x in words])
         return cls._valid_words
 
     @classmethod
@@ -24,20 +27,25 @@ class Validator:
           if word is valid else
           (False, Suggestion if possible)
         """
-        pass
+        if cls.is_valid_word(word):
+            return True, None
+        else:
+            return False, cls.get_suggestion(word)
 
     @classmethod
     def is_valid_word(cls, word: str) -> bool:
-        pass
+        return word in cls.valid_words()
 
-    def get_suggestion(self, word: str) -> Optional[str]:
+    @classmethod
+    def get_suggestion(cls, word: str) -> Optional[str]:
         """
         Tries to find a suggestion for a word if possible. Input should not
           be a valid word
         :param word: The word to base the suggestion on
         :return: A valid suggestion if possible else None
         """
-        pass
+        result = str(TextBlob(word).correct())
+        return result if cls.is_valid_word(result) else None
 
     @classmethod
     def _clean(cls):

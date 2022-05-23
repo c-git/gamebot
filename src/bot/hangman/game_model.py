@@ -1,10 +1,10 @@
 from enum import Enum
-from typing import List, Optional, Set, Tuple
+from typing import List, Optional, Set
 
 from discord import Embed
-from textblob import TextBlob
 
 from src.conf import Conf
+from src.dictionary.validator import Validator
 
 
 class Guesser(Enum):
@@ -121,10 +121,12 @@ class GameModel:
         if player != self.player_setter:
             return self.as_embed('It is not your turn.')
 
-        valid, corrected = self.validate_word(word)
+        valid, corrected = Validator.validate_word(word)
         if not valid:
+            suggestion = '' if corrected is None else \
+                f' Did you mean "{corrected}"?'
             return self.as_embed(
-                f'"{word}" in not an allowed. Did you mean {corrected}')
+                f'"{word}" in not an allowed.{suggestion}')
 
         self.word = word  # Set word
         return self.as_embed(
@@ -181,16 +183,6 @@ class GameModel:
 
     def new_lives(self):
         return ['♥'] * self.full_life_count
-
-    @staticmethod
-    def validate_word(word: str) -> Tuple[bool, str]:
-        """
-        Check if the word is valid and then suggest correct if wrong
-        :param word: The word to be checked
-        :return: True if word is valid else False and possible corrected version
-        """
-        corrected = str(TextBlob(word).correct())
-        return word == corrected, corrected
 
     def get_img_url(self) -> str:
         if self.state == State.WAITING_FOR_WORD:
