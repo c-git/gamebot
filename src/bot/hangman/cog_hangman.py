@@ -41,7 +41,8 @@ class CogHangman(commands.Cog, name='Hangman'):
                 msg = data.receive_word(ctx.author.id, args[0])
                 if data.state == State.WAITING_FOR_GUESS:
                     # Succeeded notify other player to start guessing
-                    await ctx.send('Word has been set')
+                    await ctx.send(
+                        f'Word has been set for game in <#{data.channel}>')
                     await self.notify_game_start(ctx, data, msg)
                     # Remove from waiting for guess
                     self.unreg_awaiting_word(data)
@@ -144,7 +145,9 @@ class CogHangman(commands.Cog, name='Hangman'):
     async def dm_setter(ctx: Context, game: GameModel):
         user = ctx.bot.get_user(game.player_setter)
         # TODO: Try to tell user what command should be used to supply the word
-        await user.send('Please supply the word to be guessed here')
+        await user.send(
+            f'Please supply the word to be guessed here for the game in '
+            f'<#{game.channel}>')
 
     @staticmethod
     async def notify_game_start(ctx: Context, game: GameModel, msg: Embed):
