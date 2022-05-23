@@ -65,7 +65,6 @@ class CogHangman(commands.Cog, name='Hangman'):
             return
         old_game = await self.get_game(ctx, False)
         if old_game is not None:
-            # TODO: Test starting a new game while waiting for word
             self.unreg_awaiting_word(old_game)
         new_game = GameModel(ctx.author.id, other_player.id, ctx.channel.id)
         self.data[ctx.channel.id] = new_game
@@ -144,10 +143,11 @@ class CogHangman(commands.Cog, name='Hangman'):
     @staticmethod
     async def dm_setter(ctx: Context, game: GameModel):
         user = ctx.bot.get_user(game.player_setter)
-        # TODO: Try to tell user what command should be used to supply the word
         await user.send(
             f'Please supply the word to be guessed here for the game in '
-            f'<#{game.channel}>')
+            f'<#{game.channel}>. \n Please use "{ctx.prefix}'
+            f'{"".join(ctx.invoked_parents)}" then a space and the word you '
+            f'want to set')
 
     @staticmethod
     async def notify_game_start(ctx: Context, game: GameModel, msg: Embed):
