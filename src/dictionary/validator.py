@@ -48,6 +48,7 @@ class Validator:
         with open(Conf.DICTIONARY_FN) as f:
             words = f.readlines()
         replacements = []
+        unique = set()  # used to filter out duplicate words
         for word in words:
             word = word.lower()  # Make all words lower case
 
@@ -58,6 +59,8 @@ class Validator:
             except ValueError:
                 pass
 
-            replacements.append(word)
+            if word not in unique:
+                replacements.append(word)
+                unique.add(word)
         with open(Conf.DICTIONARY_FN, 'w') as f:
             f.writelines(replacements)
