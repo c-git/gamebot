@@ -3,6 +3,7 @@ class DBKeys:  # Database key values
 
 
 class Conf:
+    DICTIONARY_FN = 'data/dict.txt'
     BOT_DESCRIPTION = "GameBot"
     VERSION = '0.0.2'
     COMMAND_PREFIX = '.'
